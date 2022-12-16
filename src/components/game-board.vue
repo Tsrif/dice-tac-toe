@@ -1,4 +1,9 @@
 <template>
+  <!-- TODO make it so you can move already placed piece
+       TODO Add some kind of turn system
+       TODO Add a way to win and lose
+       TODO Code clean up and refactor
+  -->
   <div>
     <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
       <drag
