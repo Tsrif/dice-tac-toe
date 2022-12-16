@@ -1,38 +1,5 @@
-<!-- <template>
-  <div>
-    <gamePiece
-      pieceColor="red"
-      size="2"
-      id="1"
-      @sendData="captureGamePieceData"
-    ></gamePiece>
-    <gamePiece pieceColor="red" size="2"></gamePiece>
-    <gamePiece pieceColor="red" size="2"></gamePiece>
-    <gamePiece pieceColor="blue" size="2"></gamePiece>
-    <gamePiece pieceColor="blue" size="2"></gamePiece>
-    <gamePiece pieceColor="blue" size="2"></gamePiece>
-    <div class="grid grid-cols-3 gap-3">
-      <div>
-        <GameBoardBox>
-          <gamePiece pieceColor="blue" size="2"></gamePiece>
-        </GameBoardBox>
-      </div>
-      <div><GameBoardBox></GameBoardBox></div>
-      <div><GameBoardBox></GameBoardBox></div>
-
-      <div><GameBoardBox></GameBoardBox></div>
-      <div><GameBoardBox></GameBoardBox></div>
-      <div><GameBoardBox></GameBoardBox></div>
-
-      <div><GameBoardBox></GameBoardBox></div>
-      <div><GameBoardBox></GameBoardBox></div>
-      <div><GameBoardBox></GameBoardBox></div>
-    </div>
-  </div>
-</template> -->
-
 <template>
-  <div id="app">
+  <div>
     <transition-group name="list" tag="div">
       <drag
         v-for="piece in allPieces"
@@ -45,19 +12,104 @@
         </gamePiece>
       </drag>
     </transition-group>
-    <div class="group">
-      <drop class="copy" @drop="onCopyDrop">
-        <span v-for="(n, index) in copied" :key="index"
-          >Copied {{ n }};&nbsp;</span
-        >
+    <div class="grid grid-cols-3 gap-3">
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop1($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box1Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece>
+        </span>
       </drop>
-      <drop class="cut" @drop="onCutDrop" mode="cut">
-        <span v-for="(piece, index) in cut" :key="index"
-          >Cut
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop2($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box2Data" :key="index">
           <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
           </gamePiece
-          >;&nbsp;</span
-        >
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop3($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box3Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop4($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box4Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop5($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box5Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop6($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box6Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop7($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box7Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop8($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box8Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
+      </drop>
+
+      <drop
+        class="border border-white p-10"
+        @drop="onCutDrop9($event)"
+        mode="cut"
+      >
+        <span v-for="(piece, index) in box9Data" :key="index">
+          <gamePiece :pieceColor="piece.pieceColor" :size="piece.size">
+          </gamePiece
+        ></span>
       </drop>
     </div>
   </div>
@@ -72,31 +124,63 @@ import { Drag, Drop, DropMask } from "vue-easy-dnd";
 class GamePieceData {
   constructor(
     public id: number,
-    public position: string,
     public pieceColor: string,
     public size: string
   ) {
     this.id = id;
-    this.position = position;
     this.pieceColor = pieceColor;
     this.size = size;
   }
 }
 
 const allPieces = ref([
-  new GamePieceData(1, "0", "red", "1"),
-  new GamePieceData(2, "0", "red", "1"),
-  new GamePieceData(3, "0", "red", "1"),
+  new GamePieceData(1, "red", "1"),
+  new GamePieceData(2, "blue", "1"),
+  new GamePieceData(3, "red", "1"),
 ]);
-const copied = ref([]);
-const cut = ref([]);
 
-function onCopyDrop(e) {
-  copied.value.push(e.data);
+const box1Data = ref([]);
+const box2Data = ref([]);
+const box3Data = ref([]);
+const box4Data = ref([]);
+const box5Data = ref([]);
+const box6Data = ref([]);
+const box7Data = ref([]);
+const box8Data = ref([]);
+const box9Data = ref([]);
+
+//this is terrible
+function onCutDrop1(e: Event) {
+  box1Data.value.splice(0, 1, e.data);
+  //box1Data.value.cut(e.data);
 }
-function onCutDrop(e) {
-  cut.value.push(e.data);
+function onCutDrop2(e: Event) {
+  box2Data.value.splice(0, 1, e.data);
 }
+function onCutDrop3(e: Event) {
+  box3Data.value.splice(0, 1, e.data);
+}
+
+function onCutDrop4(e: Event) {
+  box4Data.value.splice(0, 1, e.data);
+}
+function onCutDrop5(e: Event) {
+  box5Data.value.splice(0, 1, e.data);
+}
+function onCutDrop6(e: Event) {
+  box6Data.value.splice(0, 1, e.data);
+}
+
+function onCutDrop7(e: Event) {
+  box7Data.value.splice(0, 1, e.data);
+}
+function onCutDrop8(e: Event) {
+  box8Data.value.splice(0, 1, e.data);
+}
+function onCutDrop9(e: Event) {
+  box9Data.value.splice(0, 1, e.data);
+}
+
 function remove(n) {
   let index = allPieces.value.indexOf(n);
   allPieces.value.splice(index, 1);
@@ -104,35 +188,16 @@ function remove(n) {
 </script>
 
 <style>
-html,
-body {
-  height: 100%;
-  font-family: "Roboto";
-}
-
 .drag {
-  width: 60px;
-  height: 60px;
-  background-color: rgb(220, 220, 255);
-  display: inline-flex;
+  /* width: 60px;
+  height: 60px; */
+  /* background-color: rgb(220, 220, 255); */
+  /* display: inline-flex;
   align-items: center;
   justify-content: center;
   margin: 10px 10px 0 10px;
-  font-size: 20px;
+  font-size: 20px; */
   transition: all 0.5s;
-}
-
-.group {
-  display: flex;
-}
-
-.copy {
-  margin: 20px 10px;
-  border: 1px solid black;
-  height: 100px;
-  display: inline-block;
-  position: relative;
-  flex: 1;
 }
 
 .cut {
@@ -142,17 +207,6 @@ body {
   display: inline-block;
   position: relative;
   flex: 1;
-}
-
-.copy::before {
-  content: "COPY";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: rgba(0, 0, 0, 0.4);
-  font-size: 25px;
-  font-weight: bold;
 }
 
 .cut::before {
