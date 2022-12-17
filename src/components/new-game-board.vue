@@ -10,82 +10,69 @@
       <gamePiece :pieceColor="piece.pieceColor" :size="piece.size"> </gamePiece>
     </drag>
   </transition-group>
-  <v-content>
-    <v-container fluid class="wrapper">
-      <v-row>
-        <v-col>
-          <drop-list
-            :items="box1Data"
-            class="list"
-            @insert="onInsert($event, 'box1Data')"
-            @reorder="$event.apply(box1Data)"
-            mode="cut"
-          >
-            <template v-slot:item="{ item }">
-              <drag
-                class="item"
-                :class="{ selected: selected.indexOf(item) > -1 }"
-                @click="toggleSelected(box1Data, item)"
-                @cut="remove(box1Data, item)"
-                :data="selection(item)"
-                :key="item.id"
-              >
-                <gamePiece :pieceColor="item.pieceColor" :size="item.size">
-                </gamePiece>
-              </drag>
-            </template>
-            <template v-slot:feedback="{ data }">
-              <template v-if="selected.length > 0">
-                <div v-for="f in data" class="item feedback" :key="f.id">
-                  {{ f.id }}
-                </div>
-              </template>
-              <template v-else>
-                <div class="item feedback" :key="data.id">
-                  {{ data.id }}
-                </div>
-              </template>
-            </template>
-          </drop-list>
-        </v-col>
-        <v-col>
-          <drop-list
-            :items="player2Pieces"
-            class="list"
-            @insert="onInsert($event, 'player2Pieces')"
-            @reorder="$event.apply(player2Pieces)"
-            mode="cut"
-          >
-            <template v-slot:item="{ item }">
-              <drag
-                class="item"
-                :class="{ selected: selected.indexOf(item) > -1 }"
-                @click="toggleSelected(player2Pieces, item)"
-                @cut="remove(player2Pieces, item)"
-                :data="selection(item)"
-                :key="item.id"
-              >
-                <gamePiece :pieceColor="item.pieceColor" :size="item.size">
-                </gamePiece>
-              </drag>
-            </template>
-            <template v-slot:feedback="{ data }">
-              <template v-if="selected.length > 0">
-                <div v-for="f in data" class="item feedback" :key="f.id">
-                  {{ f.id }}
-                </div>
-              </template>
-              <template v-else>
-                <div class="item feedback" :key="data.id">
-                  {{ data.id }}
-                </div>
-              </template>
-            </template>
-          </drop-list>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-content>
+
+  <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
+    <drag
+      v-for="piece in player2Pieces"
+      :key="piece.id"
+      class="drag"
+      :data="piece"
+      @cut="remove(player2Pieces, piece)"
+    >
+      <gamePiece :pieceColor="piece.pieceColor" :size="piece.size"> </gamePiece>
+    </drag>
+  </transition-group>
+
+  <div fluid class="wrapper grid grid-cols-3 gap-3">
+    <!--START DRAG DROP BOX -->
+    <div v-for="(box, index) in boxes" :key="index">
+      <drop-list
+        :items="box.value"
+        class="list"
+        @insert="onInsert($event, 'box' + (index + 1) + 'Data')"
+        @reorder="$event.apply(box.value)"
+        mode="cut"
+        :accepts-data="
+          (p) => {
+            if (box.value == undefined || box.value.length === 0) {
+              return true;
+            } else if (p.size > box.value[box.value.length - 1].size) {
+              return true;
+            }
+            return false;
+          }
+        "
+      >
+        <template v-slot:item="{ item }">
+          <div v-if="item === box.value[box.value.length - 1]">
+            <drag
+              class="item"
+              :class="{ selected: selected.indexOf(item) > -1 }"
+              @click="toggleSelected(box.value, item)"
+              @cut="remove(box.value, item)"
+              :data="selection(item)"
+              :key="item.id"
+            >
+              <gamePiece :pieceColor="item.pieceColor" :size="item.size">
+              </gamePiece>
+            </drag>
+          </div>
+        </template>
+
+        <!-- You have to have this feedback slot thing. idk why -->
+        <template v-slot:feedback="{ data }">
+          <template v-if="selected.length > 0">
+            <div></div>
+          </template>
+          <template v-else>
+            <div></div>
+          </template>
+        </template>
+        <!-- end feedback slot -->
+      </drop-list>
+    </div>
+    <!--END DRAG DROP BOX -->
+  </div>
 </template>
   
   <script setup lang="ts">
@@ -104,12 +91,6 @@ class GamePieceData {
     this.size = size;
   }
 }
-
-const allPieces = ref([
-  new GamePieceData(1, "red", 1),
-  new GamePieceData(2, "blue", 1),
-  new GamePieceData(3, "red", 1),
-]);
 
 const player1Pieces = ref([
   new GamePieceData(1, "red", 1),
@@ -138,6 +119,18 @@ const box6Data = ref([]);
 const box7Data = ref([]);
 const box8Data = ref([]);
 const box9Data = ref([]);
+
+const boxes = ref([
+  box1Data,
+  box2Data,
+  box3Data,
+  box4Data,
+  box5Data,
+  box6Data,
+  box7Data,
+  box8Data,
+  box9Data,
+]);
 
 const items1 = ref([
   {
@@ -176,27 +169,31 @@ function selection(item) {
  * @llistNameist String - name of the list in the data section
  */
 function onInsert(event, listName = "items") {
-  if (event.data.length > 0) {
-    event.data.forEach((e, idx) => {
-      // event.index is the starting point of the target droplist
-      // event.index + idx = appending the items one after the other
-      this[listName].splice(event.index + idx, 0, e);
-    });
-  } else {
-    // here we have just one item
-    // @see https://codesandbox.io/s/droplist-ozs8b
-    this[listName].splice(event.index, 0, event.data);
-  }
+  //   if (event.data.length > 0) {
+  //     event.data.forEach((e, idx) => {
+  //       // event.index is the starting point of the target droplist
+  //       // event.index + idx = appending the items one after the other
+  //       console.log("poopoo");
+  //       this[listName].splice(event.index + idx, 0, e);
+  //     });
+  //   } else {
+  //     console.log("peepee");
+  //     // here we have just one item
+  //     // @see https://codesandbox.io/s/droplist-ozs8b
+  //     this[listName].splice(event.index, 0, event.data);
+  //   }
 
-  this.selected = [];
+  this[listName].push(event.data);
+
+  selected.value = [];
 }
 function remove(array, value) {
   // Following logic is taken from https://codesandbox.io/s/easy-dnd-demo-9mbij
   // In addition if we have some items in the selection
   // we apply the same logic just with a loop
 
-  if (this.selected.length > 0) {
-    this.selected.forEach((e) => {
+  if (selected.value.length > 0) {
+    selected.value.forEach((e) => {
       let index = array.indexOf(e);
       array.splice(index, 1);
     });
@@ -216,19 +213,19 @@ function remove(array, value) {
  * @item {Object} - the selected data in the list
  */
 function toggleSelected(listName, item) {
-  if (listName !== this.selectedList) {
-    this.selected = [];
-    this.selectedList = listName;
+  if (listName !== selectedList.value) {
+    selected.value = [];
+    selectedList.value = listName;
   }
 
   // Basic toggeling logic
   // If an item is in the list remove it
   // otherwise add it to the list
-  const index = this.selected.indexOf(item);
+  const index = selected.value.indexOf(item);
   if (index > -1) {
-    this.selected.splice(index, 1);
+    selected.value.splice(index, 1);
   } else {
-    this.selected.push(item);
+    selected.value.push(item);
   }
 }
 </script>
@@ -281,26 +278,25 @@ function toggleSelected(listName, item) {
 
 .wrapper .list {
   border: 1px solid black;
-  margin: 100px auto;
   width: 200px;
   min-height: 200px;
 }
 .wrapper .list .item {
-  padding: 20px;
+  /* padding: 20px;
   margin: 10px;
-  background-color: #131342;
+  background-color: #131342; */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
-.wrapper .list .item.selected {
+/* .wrapper .list .item.selected {
   border: 2px solid red;
-}
-.wrapper .list .item.feedback {
+} */
+/* .wrapper .list .item.feedback {
   background-color: #ffdcdc;
   border: 2px dashed black;
-}
+} */
 .wrapper .list .item.drag-image {
   background-color: #dcffdc;
   transform: translate(-50%, -50%);
