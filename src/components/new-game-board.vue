@@ -277,7 +277,7 @@ function toggleSelected(listName, item) {
 }
 
 .wrapper .list {
-  border: 1px solid black;
+  border: 1px solid white;
   width: 200px;
   min-height: 200px;
 }

@@ -1,27 +1,27 @@
 <template>
   <div class="p-3">
-    <div
-      v-if="size === 1"
-      class="h-5 w-5 rotate-45 transform origin-bottom-left"
-      :style="{ 'background-color': pieceColor }"
-    >
-      {{ size }}
+    <div v-if="size === 1" class="p-2 inline-block">
+      <font-awesome-icon
+        icon="fa-solid fa-dice-one"
+        :color="pieceColor"
+        size="6x"
+      />
     </div>
 
-    <div
-      v-else-if="size === 2"
-      class="p-2 inline-block"
-      :style="{ 'background-color': pieceColor }"
-    >
-      {{ size }}
+    <div v-else-if="size === 2" class="p-2 inline-block">
+      <font-awesome-icon
+        icon="fa-solid fa-dice-two"
+        :color="pieceColor"
+        size="6x"
+      />
     </div>
 
-    <div
-      v-else-if="size === 3"
-      class="p-2 rounded-full inline-block items-center justify-center"
-      :style="{ 'background-color': pieceColor }"
-    >
-      {{ size }}
+    <div v-else-if="size === 3" class="p-2 inline-block">
+      <font-awesome-icon
+        icon="fa-solid fa-dice-three fa-lg"
+        :color="pieceColor"
+        size="6x"
+      />
     </div>
   </div>
 </template>
