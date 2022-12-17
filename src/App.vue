@@ -1,13 +1,10 @@
 <template>
   <div>
-    <GameBoard />
+    <NewGameBoard />
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import GameBoard from "./components/game-board.vue";
-export default {
-  name: "App",
-  components: { GameBoard },
-};
+import NewGameBoard from "./components/new-game-board.vue";
 </script>
