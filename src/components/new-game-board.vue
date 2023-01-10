@@ -1,3 +1,4 @@
+<!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
 <template>
   <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
     <drag

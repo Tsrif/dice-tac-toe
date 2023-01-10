@@ -1,4 +1,5 @@
-TODO make it so you can move already placed piece
 TODO Add some kind of turn system
 TODO Add a way to win and lose
 TODO Code clean up and refactor
+TODO Make it so when you pickup a piece you have to place it somewhere else?
+TODO what if I keep the dice aesthetic, but make it so you stack the dice on top of each other?
