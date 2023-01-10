@@ -133,29 +133,6 @@ const boxes = ref([
   box9Data,
 ]);
 
-const items1 = ref([
-  {
-    name: "Frozen Yogurt",
-    calories: 159,
-    fat: 6.0,
-  },
-  {
-    name: "Ice cream sandwich",
-    calories: 237,
-    fat: 9.0,
-  },
-  {
-    name: "Eclair",
-    calories: 262,
-    fat: 16.0,
-  },
-  {
-    name: "More ice cream sandwich",
-    calories: 237,
-    fat: 9.0,
-  },
-]);
-const items2 = ref([]);
 const selected = ref([]);
 const selectedList = ref(0);
 
@@ -170,20 +147,6 @@ function selection(item) {
  * @llistNameist String - name of the list in the data section
  */
 function onInsert(event, listName = "items") {
-  //   if (event.data.length > 0) {
-  //     event.data.forEach((e, idx) => {
-  //       // event.index is the starting point of the target droplist
-  //       // event.index + idx = appending the items one after the other
-  //       console.log("poopoo");
-  //       this[listName].splice(event.index + idx, 0, e);
-  //     });
-  //   } else {
-  //     console.log("peepee");
-  //     // here we have just one item
-  //     // @see https://codesandbox.io/s/droplist-ozs8b
-  //     this[listName].splice(event.index, 0, event.data);
-  //   }
-
   this[listName].push(event.data);
 
   selected.value = [];
