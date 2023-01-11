@@ -1,10 +1,6 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
-
-<!-- Once a player drops a piece, that player's turn has ended and it is the next players turn. 
-  Only the current players pieces should be able to be placed. 
-  Make not current player's pieces disabled? -->
 <template>
-  <div>Current Turn: {{ currentTurn }}</div>
+  <div>{{ currentTurn }}</div>
   <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
     <drag
       v-for="piece in player1Pieces"
@@ -165,10 +161,9 @@ function selection(item) {
  */
 function onInsert(event, listName = "items") {
   this[listName].push(event.data);
-  currentTurn.value =
-    currentTurn.value == gameStates.player1Turn
-      ? gameStates.player2Turn
-      : gameStates.player1Turn;
+  checkWinner();
+
+  //tbh I don't know if this is needed
   selected.value = [];
 }
 function remove(array, value) {
@@ -219,6 +214,77 @@ function setDisabled(color) {
   } else if (color == "blue" && currentTurn.value == gameStates.player2Turn) {
     return false;
   } else return true;
+}
+
+function checkWinner() {
+  var playerColor;
+
+  if (currentTurn.value == gameStates.player1Turn) {
+    playerColor = "red";
+  } else {
+    playerColor = "blue";
+  }
+
+  //might be ineffiencent to create this everytime?
+  var board = [
+    [box1Data, box2Data, box3Data],
+    [box4Data, box5Data, box6Data],
+    [box7Data, box8Data, box9Data],
+  ];
+
+  //Horizontal
+  for (let i = 0; i < 3; i++) {
+    if (
+      board[i][0].value.at(-1)?.pieceColor === playerColor &&
+      board[i][1].value.at(-1)?.pieceColor === playerColor &&
+      board[i][2].value.at(-1)?.pieceColor === playerColor
+    ) {
+      console.log("HORIZONTAL WINNER");
+      currentTurn.value = gameStates.gameOver;
+      return true;
+    }
+  }
+
+  //Vertical
+  for (let i = 0; i < 3; i++) {
+    if (
+      board[0][i].value.at(-1)?.pieceColor === playerColor &&
+      board[1][i].value.at(-1)?.pieceColor === playerColor &&
+      board[2][i].value.at(-1)?.pieceColor === playerColor
+    ) {
+      console.log("VERTICAL WINNER");
+      currentTurn.value = gameStates.gameOver;
+      return true;
+    }
+  }
+
+  //Diagonals
+  if (
+    board[0][0].value.at(-1)?.pieceColor === playerColor &&
+    board[1][1].value.at(-1)?.pieceColor === playerColor &&
+    board[2][2].value.at(-1)?.pieceColor === playerColor
+  ) {
+    console.log("DIAGONAL WINNER");
+    currentTurn.value = gameStates.gameOver;
+    return true;
+  }
+  if (
+    board[1][0].value.at(-1)?.pieceColor === playerColor &&
+    board[1][1].value.at(-1)?.pieceColor === playerColor &&
+    board[0][2].value.at(-1)?.pieceColor === playerColor
+  ) {
+    console.log("DIAGONAL WINNER");
+    currentTurn.value = gameStates.gameOver;
+    return true;
+  }
+
+  console.log("no winner found, swapping turns");
+  //swap current turn
+  currentTurn.value =
+    currentTurn.value == gameStates.player1Turn
+      ? gameStates.player2Turn
+      : gameStates.player1Turn;
+  return false;
 }
 </script>
   
