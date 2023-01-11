@@ -1,9 +1,15 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
+
+<!-- Once a player drops a piece, that player's turn has ended and it is the next players turn. 
+  Only the current players pieces should be able to be placed. 
+  Make not current player's pieces disabled? -->
 <template>
+  <div>Current Turn: {{ currentTurn }}</div>
   <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
     <drag
       v-for="piece in player1Pieces"
       :key="piece.id"
+      :disabled="currentTurn == gameStates.player1Turn ? false : true"
       class="drag"
       :data="piece"
       @cut="remove(player1Pieces, piece)"
@@ -16,6 +22,7 @@
     <drag
       v-for="piece in player2Pieces"
       :key="piece.id"
+      :disabled="currentTurn == gameStates.player2Turn ? false : true"
       class="drag"
       :data="piece"
       @cut="remove(player2Pieces, piece)"
@@ -44,11 +51,13 @@
           }
         "
       >
+        <!-- gamepiece / inside the droplist -->
         <template v-slot:item="{ item }">
           <div v-if="item === box.value[box.value.length - 1]">
             <drag
               class="item"
               :class="{ selected: selected.indexOf(item) > -1 }"
+              :disabled="setDisabled(item.pieceColor)"
               @click="toggleSelected(box.value, item)"
               @cut="remove(box.value, item)"
               :data="selection(item)"
@@ -136,6 +145,14 @@ const boxes = ref([
 const selected = ref([]);
 const selectedList = ref(0);
 
+const gameStates = {
+  player1Turn: "Player 1",
+  player2Turn: "Player 2",
+  gameOver: "Game Over",
+};
+
+const currentTurn = ref(gameStates.player1Turn);
+
 function selection(item) {
   return this.selected.length > 0 ? this.selected : item;
 }
@@ -148,7 +165,10 @@ function selection(item) {
  */
 function onInsert(event, listName = "items") {
   this[listName].push(event.data);
-
+  currentTurn.value =
+    currentTurn.value == gameStates.player1Turn
+      ? gameStates.player2Turn
+      : gameStates.player1Turn;
   selected.value = [];
 }
 function remove(array, value) {
@@ -191,6 +211,14 @@ function toggleSelected(listName, item) {
   } else {
     selected.value.push(item);
   }
+}
+
+function setDisabled(color) {
+  if (color == "red" && currentTurn.value == gameStates.player1Turn) {
+    return false;
+  } else if (color == "blue" && currentTurn.value == gameStates.player2Turn) {
+    return false;
+  } else return true;
 }
 </script>
   
