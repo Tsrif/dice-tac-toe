@@ -1,9 +1,9 @@
 <template>
   <div>
-    <NewGameBoard />
+    <GameBoard />
   </div>
 </template>
 
 <script setup lang="ts">
-import NewGameBoard from "./components/new-game-board.vue";
+import GameBoard from "./components/game-board.vue";
 </script>
