@@ -36,21 +36,13 @@
         @insert="onInsert($event, 'box' + (index + 1) + 'Data')"
         @reorder="$event.apply(box.value)"
         mode="cut"
-        :accepts-data="
-          (p) => {
-            if (box.value == undefined || box.value.length === 0) {
-              return true;
-            } else if (p.size > box.value[box.value.length - 1].size) {
-              return true;
-            }
-            return false;
-          }
-        "
+        :accepts-data="(p) => checkAccept(p, box)"
       >
         <!-- gamepiece / inside the droplist -->
         <template v-slot:item="{ item }">
-          <div v-if="item === box.value[box.value.length - 1]">
+          <div>
             <drag
+              v-if="item === box.value[box.value.length - 1]"
               class="item"
               :class="{ selected: selected.indexOf(item) > -1 }"
               :disabled="setDisabled(item.pieceColor)"
@@ -62,6 +54,13 @@
               <gamePiece :pieceColor="item.pieceColor" :size="item.size">
               </gamePiece>
             </drag>
+            <gamePiece
+              v-else
+              :pieceColor="item.pieceColor"
+              :size="item.size"
+              icon-size="2x"
+            >
+            </gamePiece>
           </div>
         </template>
 
@@ -214,6 +213,15 @@ function setDisabled(color) {
   } else if (color == "blue" && currentTurn.value == gameStates.player2Turn) {
     return false;
   } else return true;
+}
+
+function checkAccept(p, box) {
+  if (box.value == undefined || box.value.length === 0) {
+    return true;
+  } else if (p.size > box.value[box.value.length - 1].size) {
+    return true;
+  }
+  return false;
 }
 
 function checkWinner() {

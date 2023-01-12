@@ -1,26 +1,26 @@
 <template>
-  <div class="p-3">
-    <div v-if="size === 1" class="p-2 inline-block">
+  <div>
+    <div v-if="size === 1">
       <font-awesome-icon
         icon="fa-solid fa-dice-one"
         :color="pieceColor"
-        size="6x"
+        :size="iconSize"
       />
     </div>
 
-    <div v-else-if="size === 2" class="p-2 inline-block">
+    <div v-else-if="size === 2">
       <font-awesome-icon
         icon="fa-solid fa-dice-two"
         :color="pieceColor"
-        size="6x"
+        :size="iconSize"
       />
     </div>
 
-    <div v-else-if="size === 3" class="p-2 inline-block">
+    <div v-else-if="size === 3">
       <font-awesome-icon
-        icon="fa-solid fa-dice-three fa-lg"
+        icon="fa-solid fa-dice-three"
         :color="pieceColor"
-        size="6x"
+        :size="iconSize"
       />
     </div>
   </div>
@@ -32,5 +32,6 @@ import { ref } from "vue";
 const props = defineProps({
   pieceColor: { type: String, default: "red", required: true },
   size: { type: Number, default: 1, required: true },
+  iconSize: { type: String, default: "6x", required: true },
 });
 </script>
