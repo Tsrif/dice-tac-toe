@@ -1,21 +1,14 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
-<template>
-  <!-- TURN ORDER -->
+<template><!-- TURN ORDER -->
   <div class="flex items-center justify-center text-lg" v-if="!winner">
-    <div
-      class="w-10 h-10 rounded"
-      :class="
-        currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
-      "
-    ></div>
+    <div class="w-10 h-10 rounded" :class="
+      currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
+    "></div>
 
     <div class="p-5">TURN</div>
-    <div
-      class="w-10 h-10 rounded"
-      :class="
-        currentTurn == gameStates.player2Turn ? 'bg-blue-600' : 'bg-gray-500'
-      "
-    ></div>
+    <div class="w-10 h-10 rounded" :class="
+      currentTurn == gameStates.player2Turn ? 'bg-blue-600' : 'bg-gray-500'
+    "></div>
     <div class="top-0 left-40">
       <rules></rules>
     </div>
@@ -28,20 +21,12 @@
   <!-- PLAYER 1 PIECES -->
   <div class="flex items-center justify-center w-[850px]">
     <transition-group name="list" tag="div" class="grid grid-cols-1 gap-3">
-      <drag
-        v-for="piece in player1Pieces"
-        :key="piece.id"
-        :disabled="currentTurn == gameStates.player1Turn ? false : true"
-        class="drag"
-        :data="piece"
-        @cut="remove(player1Pieces, piece)"
-      >
-        <gamePiece
-          :pieceColor="
-            currentTurn == gameStates.player1Turn ? piece.pieceColor : 'gray'
-          "
-          :size="piece.size"
-        >
+      <drag v-for="piece in player1Pieces" :key="piece.id"
+        :disabled="currentTurn == gameStates.player1Turn ? false : true" class="drag" :data="piece"
+        @cut="remove(player1Pieces, piece)">
+        <gamePiece :pieceColor="
+          currentTurn == gameStates.player1Turn ? piece.pieceColor : 'gray'
+        " :size="piece.size">
         </gamePiece>
       </drag>
     </transition-group>
@@ -50,36 +35,19 @@
     <div fluid class="wrapper grid grid-cols-3 gap-3 p-5">
       <!--START DRAG DROP BOX -->
       <div v-for="(box, index) in boxes" :key="index">
-        <drop-list
-          :items="box.value"
-          class="list"
-          @insert="onInsert($event, 'box' + (index + 1) + 'Data')"
-          @reorder="$event.apply(box.value)"
-          mode="cut"
-          :accepts-data="(p) => checkAccept(p, box)"
-        >
+        <drop-list :items="box.value" class="list" @insert="onInsert($event, index)" @reorder="$event.apply(box.value)"
+          mode="cut" :accepts-data="(p) => checkAccept(p, box)">
           <!-- gamepiece / inside the droplist -->
           <template v-slot:item="{ item }">
             <div>
-              <drag
-                v-if="item === box.value[box.value.length - 1]"
-                class="item"
-                :class="{ selected: selected.indexOf(item) > -1 }"
-                :disabled="setDisabled(item.pieceColor)"
-                @click="toggleSelected(box.value, item)"
-                @cut="remove(box.value, item)"
-                :data="selection(item)"
-                :key="item.id"
-              >
+              <drag v-if="item === box.value[box.value.length - 1]" class="item"
+                :class="{ selected: selected.indexOf(item) > -1 }" :disabled="setDisabled(item.pieceColor)"
+                @click="toggleSelected(box.value, item)" @cut="remove(box.value, item)" :data="selection(item)"
+                :key="item.id">
                 <gamePiece :pieceColor="item.pieceColor" :size="item.size">
                 </gamePiece>
               </drag>
-              <gamePiece
-                v-else
-                :pieceColor="item.pieceColor"
-                :size="item.size"
-                icon-size="2x"
-              >
+              <gamePiece v-else :pieceColor="item.pieceColor" :size="item.size" icon-size="2x">
               </gamePiece>
             </div>
           </template>
@@ -100,25 +68,13 @@
     </div>
 
     <!-- PLAYER 2 PIECES -->
-    <transition-group
-      name="list"
-      tag="div"
-      class="grid grid-cols-1 gap-3 flex-1"
-    >
-      <drag
-        v-for="piece in player2Pieces"
-        :key="piece.id"
-        :disabled="currentTurn == gameStates.player2Turn ? false : true"
-        class="drag"
-        :data="piece"
-        @cut="remove(player2Pieces, piece)"
-      >
-        <gamePiece
-          :pieceColor="
-            currentTurn == gameStates.player2Turn ? piece.pieceColor : 'gray'
-          "
-          :size="piece.size"
-        >
+    <transition-group name="list" tag="div" class="grid grid-cols-1 gap-3 flex-1">
+      <drag v-for="piece in player2Pieces" :key="piece.id"
+        :disabled="currentTurn == gameStates.player2Turn ? false : true" class="drag" :data="piece"
+        @cut="remove(player2Pieces, piece)">
+        <gamePiece :pieceColor="
+          currentTurn == gameStates.player2Turn ? piece.pieceColor : 'gray'
+        " :size="piece.size">
         </gamePiece>
       </drag>
     </transition-group>
@@ -126,17 +82,14 @@
 
   <!-- RESET BUTTON -->
   <div class="flex items-center justify-center text-lg">
-    <button
-      @click="resetBoard"
-      type="button"
-      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-    >
+    <button @click="resetBoard" type="button"
+      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
       RESET
     </button>
   </div>
 </template>
   
-  <script setup lang="ts">
+<script setup lang="ts">
 import { Drag, DropList } from "vue-easy-dnd";
 import { ref } from "vue";
 import gamePiece from "./game-piece.vue";
@@ -223,8 +176,8 @@ function selection(item) {
  * @event {InsertEvent} - holds dragging data and drop index
  * @llistNameist String - name of the list in the data section
  */
-function onInsert(event, listName = "items") {
-  this[listName].push(event.data);
+function onInsert(event, boxIndex) {
+  boxes.value[boxIndex].value.push(event.data as never)
   checkWinner();
 
   //tbh I don't know if this is needed
@@ -390,7 +343,7 @@ function resetBoard() {
 }
 </script>
   
-  <style>
+<style>
 .drag {
   transition: all 0.5s;
 }
@@ -442,6 +395,7 @@ function resetBoard() {
   min-height: 200px;
   border-radius: 0.25rem;
 }
+
 .wrapper .list .item {
   /* padding: 20px;
   margin: 10px;
@@ -451,6 +405,7 @@ function resetBoard() {
   justify-content: center;
   text-align: center;
 }
+
 /* .wrapper .list .item.selected {
   border: 2px solid red;
 } */
