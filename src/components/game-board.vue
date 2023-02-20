@@ -41,7 +41,7 @@
           <template v-slot:item="{ item }">
             <div>
               <drag v-if="item === box.value[box.value.length - 1]" class="item"
-                :class="{ selected: selected.indexOf(item) > -1 }" :disabled="setDisabled(item.pieceColor)"
+                :class="{ selected: selected.indexOf(item as never) > -1 }" :disabled="setDisabled(item.pieceColor)"
                 @click="toggleSelected(box.value, item)" @cut="remove(box.value, item)" :data="selection(item)"
                 :key="item.id">
                 <gamePiece :pieceColor="item.pieceColor" :size="item.size">
@@ -167,7 +167,7 @@ const winner = ref("");
 const currentTurn = ref(gameStates.player1Turn);
 
 function selection(item) {
-  return this.selected.length > 0 ? this.selected : item;
+  return selected.value.length > 0 ? selected : item;
 }
 /**
  * Inserts one or multiple selected items into the target
@@ -217,11 +217,11 @@ function toggleSelected(listName, item) {
   // Basic toggeling logic
   // If an item is in the list remove it
   // otherwise add it to the list
-  const index = selected.value.indexOf(item);
+  const index = selected.value.indexOf(item as never);
   if (index > -1) {
     selected.value.splice(index, 1);
   } else {
-    selected.value.push(item);
+    selected.value.push(item as never);
   }
 }
 
