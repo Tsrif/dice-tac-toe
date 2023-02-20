@@ -1,82 +1,130 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
 <template>
-  <div>{{ currentTurn }}</div>
-  <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
-    <drag
-      v-for="piece in player1Pieces"
-      :key="piece.id"
-      :disabled="currentTurn == gameStates.player1Turn ? false : true"
-      class="drag"
-      :data="piece"
-      @cut="remove(player1Pieces, piece)"
-    >
-      <gamePiece :pieceColor="piece.pieceColor" :size="piece.size"> </gamePiece>
-    </drag>
-  </transition-group>
+  <!-- TURN ORDER -->
+  <div class="flex items-center justify-center text-lg">
+    <div
+      class="w-10 h-10 rounded"
+      :class="
+        currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
+      "
+    ></div>
+    <div class="p-5">TURN</div>
+    <div
+      class="w-10 h-10 rounded"
+      :class="
+        currentTurn == gameStates.player2Turn ? 'bg-blue-600' : 'bg-gray-500'
+      "
+    ></div>
+  </div>
 
-  <transition-group name="list" tag="div" class="grid grid-cols-3 gap-3">
-    <drag
-      v-for="piece in player2Pieces"
-      :key="piece.id"
-      :disabled="currentTurn == gameStates.player2Turn ? false : true"
-      class="drag"
-      :data="piece"
-      @cut="remove(player2Pieces, piece)"
-    >
-      <gamePiece :pieceColor="piece.pieceColor" :size="piece.size"> </gamePiece>
-    </drag>
-  </transition-group>
-
-  <div fluid class="wrapper grid grid-cols-3 gap-3">
-    <!--START DRAG DROP BOX -->
-    <div v-for="(box, index) in boxes" :key="index">
-      <drop-list
-        :items="box.value"
-        class="list"
-        @insert="onInsert($event, 'box' + (index + 1) + 'Data')"
-        @reorder="$event.apply(box.value)"
-        mode="cut"
-        :accepts-data="(p) => checkAccept(p, box)"
+  <!-- PLAYER 1 PIECES -->
+  <div class="flex items-center justify-center w-[850px]">
+    <transition-group name="list" tag="div" class="grid grid-cols-1 gap-3">
+      <drag
+        v-for="piece in player1Pieces"
+        :key="piece.id"
+        :disabled="currentTurn == gameStates.player1Turn ? false : true"
+        class="drag"
+        :data="piece"
+        @cut="remove(player1Pieces, piece)"
       >
-        <!-- gamepiece / inside the droplist -->
-        <template v-slot:item="{ item }">
-          <div>
-            <drag
-              v-if="item === box.value[box.value.length - 1]"
-              class="item"
-              :class="{ selected: selected.indexOf(item) > -1 }"
-              :disabled="setDisabled(item.pieceColor)"
-              @click="toggleSelected(box.value, item)"
-              @cut="remove(box.value, item)"
-              :data="selection(item)"
-              :key="item.id"
-            >
-              <gamePiece :pieceColor="item.pieceColor" :size="item.size">
-              </gamePiece>
-            </drag>
-            <gamePiece
-              v-else
-              :pieceColor="item.pieceColor"
-              :size="item.size"
-              icon-size="2x"
-            >
-            </gamePiece>
-          </div>
-        </template>
+        <gamePiece
+          :pieceColor="
+            currentTurn == gameStates.player1Turn ? piece.pieceColor : 'gray'
+          "
+          :size="piece.size"
+        >
+        </gamePiece>
+      </drag>
+    </transition-group>
 
-        <!-- You have to have this feedback slot thing. idk why -->
-        <template v-slot:feedback="{ data }">
-          <template v-if="selected.length > 0">
-            <div></div>
+    <!-- GAMEBOARD -->
+    <div fluid class="wrapper grid grid-cols-3 gap-3 p-5">
+      <!--START DRAG DROP BOX -->
+      <div v-for="(box, index) in boxes" :key="index">
+        <drop-list
+          :items="box.value"
+          class="list"
+          @insert="onInsert($event, 'box' + (index + 1) + 'Data')"
+          @reorder="$event.apply(box.value)"
+          mode="cut"
+          :accepts-data="(p) => checkAccept(p, box)"
+        >
+          <!-- gamepiece / inside the droplist -->
+          <template v-slot:item="{ item }">
+            <div>
+              <drag
+                v-if="item === box.value[box.value.length - 1]"
+                class="item"
+                :class="{ selected: selected.indexOf(item) > -1 }"
+                :disabled="setDisabled(item.pieceColor)"
+                @click="toggleSelected(box.value, item)"
+                @cut="remove(box.value, item)"
+                :data="selection(item)"
+                :key="item.id"
+              >
+                <gamePiece :pieceColor="item.pieceColor" :size="item.size">
+                </gamePiece>
+              </drag>
+              <gamePiece
+                v-else
+                :pieceColor="item.pieceColor"
+                :size="item.size"
+                icon-size="2x"
+              >
+              </gamePiece>
+            </div>
           </template>
-          <template v-else>
-            <div></div>
+
+          <!-- You have to have this feedback slot thing. idk why -->
+          <template v-slot:feedback="{ data }">
+            <template v-if="selected.length > 0">
+              <div></div>
+            </template>
+            <template v-else>
+              <div></div>
+            </template>
           </template>
-        </template>
-        <!-- end feedback slot -->
-      </drop-list>
+          <!-- end feedback slot -->
+        </drop-list>
+      </div>
+      <!--END DRAG DROP BOX -->
     </div>
-    <!--END DRAG DROP BOX -->
+
+    <!-- PLAYER 2 PIECES -->
+    <transition-group
+      name="list"
+      tag="div"
+      class="grid grid-cols-1 gap-3 flex-1"
+    >
+      <drag
+        v-for="piece in player2Pieces"
+        :key="piece.id"
+        :disabled="currentTurn == gameStates.player2Turn ? false : true"
+        class="drag"
+        :data="piece"
+        @cut="remove(player2Pieces, piece)"
+      >
+        <gamePiece
+          :pieceColor="
+            currentTurn == gameStates.player2Turn ? piece.pieceColor : 'gray'
+          "
+          :size="piece.size"
+        >
+        </gamePiece>
+      </drag>
+    </transition-group>
+  </div>
+
+  <!-- RESET BUTTON -->
+  <div class="flex items-center justify-center text-lg">
+    <button
+      @click="resetBoard"
+      type="button"
+      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+    >
+      RESET
+    </button>
   </div>
 </template>
   
@@ -136,6 +184,12 @@ const boxes = ref([
   box8Data,
   box9Data,
 ]);
+
+var board = [
+  [box1Data, box2Data, box3Data],
+  [box4Data, box5Data, box6Data],
+  [box7Data, box8Data, box9Data],
+];
 
 const selected = ref([]);
 const selectedList = ref(0);
@@ -233,13 +287,6 @@ function checkWinner() {
     playerColor = "blue";
   }
 
-  //might be ineffiencent to create this everytime?
-  var board = [
-    [box1Data, box2Data, box3Data],
-    [box4Data, box5Data, box6Data],
-    [box7Data, box8Data, box9Data],
-  ];
-
   //Horizontal
   for (let i = 0; i < 3; i++) {
     if (
@@ -294,6 +341,35 @@ function checkWinner() {
       : gameStates.player1Turn;
   return false;
 }
+
+function resetBoard() {
+  //reset boxes
+  boxes.value.forEach((b) => {
+    b.value = [];
+  });
+
+  //reset pieces
+  player1Pieces.value = [
+    new GamePieceData(1, "red", 1),
+    new GamePieceData(2, "red", 1),
+    new GamePieceData(3, "red", 2),
+    new GamePieceData(4, "red", 2),
+    new GamePieceData(5, "red", 3),
+    new GamePieceData(6, "red", 3),
+  ];
+
+  player2Pieces.value = [
+    new GamePieceData(7, "blue", 1),
+    new GamePieceData(8, "blue", 1),
+    new GamePieceData(9, "blue", 2),
+    new GamePieceData(10, "blue", 2),
+    new GamePieceData(11, "blue", 3),
+    new GamePieceData(12, "blue", 3),
+  ];
+
+  //reset turn
+  currentTurn.value = gameStates.player1Turn;
+}
 </script>
   
   <style>
@@ -322,15 +398,15 @@ function checkWinner() {
 }
 
 .drop-allowed {
-  background-color: rgba(0, 255, 0, 0.2);
+  background-color: #14532d;
 }
 
 .drop-forbidden {
-  background-color: rgba(255, 0, 0, 0.2);
+  background-color: #881337;
 }
 
 .drop-in {
-  box-shadow: 0 0 5px rgba(0, 0, 255, 0.4);
+  box-shadow: 0 0 5px #1e3a8a;
 }
 
 .list-enter,
@@ -346,6 +422,7 @@ function checkWinner() {
   border: 1px solid white;
   width: 200px;
   min-height: 200px;
+  border-radius: 0.25rem;
 }
 .wrapper .list .item {
   /* padding: 20px;
