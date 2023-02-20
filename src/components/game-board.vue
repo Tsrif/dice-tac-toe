@@ -1,13 +1,14 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
 <template>
   <!-- TURN ORDER -->
-  <div class="flex items-center justify-center text-lg">
+  <div class="flex items-center justify-center text-lg" v-if="!winner">
     <div
       class="w-10 h-10 rounded"
       :class="
         currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
       "
     ></div>
+
     <div class="p-5">TURN</div>
     <div
       class="w-10 h-10 rounded"
@@ -15,6 +16,13 @@
         currentTurn == gameStates.player2Turn ? 'bg-blue-600' : 'bg-gray-500'
       "
     ></div>
+    <div class="top-0 left-40">
+      <rules></rules>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-center text-lg" v-else>
+    {{ winner }}
   </div>
 
   <!-- PLAYER 1 PIECES -->
@@ -132,6 +140,7 @@
 import { Drag, DropList } from "vue-easy-dnd";
 import { ref } from "vue";
 import gamePiece from "./game-piece.vue";
+import rules from "./rules.vue";
 
 class GamePieceData {
   constructor(
@@ -199,6 +208,8 @@ const gameStates = {
   player2Turn: "Player 2",
   gameOver: "Game Over",
 };
+
+const winner = ref("");
 
 const currentTurn = ref(gameStates.player1Turn);
 
@@ -295,6 +306,7 @@ function checkWinner() {
       board[i][2].value.at(-1)?.pieceColor === playerColor
     ) {
       console.log("HORIZONTAL WINNER");
+      winner.value = playerColor + " wins";
       currentTurn.value = gameStates.gameOver;
       return true;
     }
@@ -308,6 +320,7 @@ function checkWinner() {
       board[2][i].value.at(-1)?.pieceColor === playerColor
     ) {
       console.log("VERTICAL WINNER");
+      winner.value = playerColor + " wins";
       currentTurn.value = gameStates.gameOver;
       return true;
     }
@@ -320,6 +333,7 @@ function checkWinner() {
     board[2][2].value.at(-1)?.pieceColor === playerColor
   ) {
     console.log("DIAGONAL WINNER");
+    winner.value = playerColor + " wins";
     currentTurn.value = gameStates.gameOver;
     return true;
   }
@@ -329,6 +343,7 @@ function checkWinner() {
     board[0][2].value.at(-1)?.pieceColor === playerColor
   ) {
     console.log("DIAGONAL WINNER");
+    winner.value = playerColor + " wins";
     currentTurn.value = gameStates.gameOver;
     return true;
   }
@@ -369,6 +384,9 @@ function resetBoard() {
 
   //reset turn
   currentTurn.value = gameStates.player1Turn;
+
+  //reset winner
+  winner.value = "";
 }
 </script>
   

@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faDiceOne } from '@fortawesome/free-solid-svg-icons'
 import { faDiceTwo } from '@fortawesome/free-solid-svg-icons'
 import { faDiceThree } from '@fortawesome/free-solid-svg-icons'
+import { faQuestion } from '@fortawesome/free-solid-svg-icons'
 
 
 
@@ -23,6 +24,7 @@ import { faDiceThree } from '@fortawesome/free-solid-svg-icons'
 library.add(faDiceOne)
 library.add(faDiceTwo)
 library.add(faDiceThree)
+library.add(faQuestion)
 
 
 const app = createApp(App);
