@@ -14,8 +14,11 @@
           currentTurn == gameStates.player2Turn ? 'bg-[#0EA5E9]' : 'bg-gray-500'
         "></div>
       </div>
-      <div v-else>
-        {{ winner }}
+      <div class="flex ml-auto text-5xl uppercase" v-else>
+        <b :class="
+          winner == 'red' ? 'text-[#F43F5E]' : 'text-[#0EA5E9]'
+        ">{{ winner }}</b> wins
+
       </div>
       <!-- RULES -->
       <div class="ml-auto">
@@ -274,7 +277,7 @@ function checkWinner() {
       board[i][0].value.containsWinningPiece = true;
       board[i][1].value.containsWinningPiece = true;
       board[i][2].value.containsWinningPiece = true;
-      winner.value = playerColor + " wins";
+      winner.value = playerColor;
       currentTurn.value = gameStates.gameOver;
       return true;
     }
@@ -293,7 +296,7 @@ function checkWinner() {
       board[1][i].value.containsWinningPiece = true;
       board[2][i].value.containsWinningPiece = true;
 
-      winner.value = playerColor + " wins";
+      winner.value = playerColor;
       currentTurn.value = gameStates.gameOver;
       return true;
     }
@@ -311,7 +314,7 @@ function checkWinner() {
     board[1][1].value.containsWinningPiece = true;
     board[2][2].value.containsWinningPiece = true;
 
-    winner.value = playerColor + " wins";
+    winner.value = playerColor;
     currentTurn.value = gameStates.gameOver;
     return true;
   }
@@ -326,7 +329,7 @@ function checkWinner() {
     board[1][1].value.containsWinningPiece = true;
     board[2][0].value.containsWinningPiece = true;
 
-    winner.value = playerColor + " wins";
+    winner.value = playerColor;
     currentTurn.value = gameStates.gameOver;
     return true;
   }
