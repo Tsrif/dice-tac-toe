@@ -1,5 +1,6 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
-<template><!-- TURN ORDER -->
+<template>
+<!-- TURN ORDER -->
   <div class="flex items-center justify-center text-lg" v-if="!winner">
     <div class="w-10 h-10 rounded" :class="
       currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
@@ -35,14 +36,14 @@
     <div fluid class="wrapper grid grid-cols-3 gap-3 p-5">
       <!--START DRAG DROP BOX -->
       <div v-for="(box, index) in boxes" :key="index">
-        <drop-list :items="box.value" class="list" @insert="onInsert($event, index)" @reorder="$event.apply(box.value)"
+        <drop-list :items="box.value.pieces" :class="box.value.containsWinningPiece ? 'bg-green-700' : ''" class="list" @insert="onInsert($event, index)" @reorder="$event.apply(box.value.pieces)"
           mode="cut" :accepts-data="(p) => checkAccept(p, box)">
           <!-- gamepiece / inside the droplist -->
           <template v-slot:item="{ item }">
             <div>
-              <drag v-if="item === box.value[box.value.length - 1]" class="item"
+              <drag v-if="item === box.value.pieces[box.value.pieces.length - 1]" class="item"
                 :class="{ selected: selected.indexOf(item as never) > -1 }" :disabled="setDisabled(item.pieceColor)"
-                @click="toggleSelected(box.value, item)" @cut="remove(box.value, item)" :data="selection(item)"
+                @click="toggleSelected(box.value.pieces, item)" @cut="remove(box.value.pieces, item)" :data="selection(item)"
                 :key="item.id">
                 <gamePiece :pieceColor="item.pieceColor" :size="item.size">
                 </gamePiece>
@@ -107,6 +108,16 @@ class GamePieceData {
   }
 }
 
+class GameBoxData {
+  constructor(
+    public pieces: [],
+    public containsWinningPiece: boolean
+  ) {
+    this.pieces = pieces;
+    this.containsWinningPiece = containsWinningPiece;
+  }
+}
+
 const player1Pieces = ref([
   new GamePieceData(1, "red", 1),
   new GamePieceData(2, "red", 1),
@@ -125,15 +136,15 @@ const player2Pieces = ref([
   new GamePieceData(12, "blue", 3),
 ]);
 
-const box1Data = ref([]);
-const box2Data = ref([]);
-const box3Data = ref([]);
-const box4Data = ref([]);
-const box5Data = ref([]);
-const box6Data = ref([]);
-const box7Data = ref([]);
-const box8Data = ref([]);
-const box9Data = ref([]);
+const box1Data = ref(new GameBoxData([],false));
+const box2Data = ref(new GameBoxData([],false));
+const box3Data = ref(new GameBoxData([],false));
+const box4Data = ref(new GameBoxData([],false));
+const box5Data = ref(new GameBoxData([],false));
+const box6Data = ref(new GameBoxData([],false));
+const box7Data = ref(new GameBoxData([],false));
+const box8Data = ref(new GameBoxData([],false));
+const box9Data = ref(new GameBoxData([],false));
 
 const boxes = ref([
   box1Data,
@@ -177,7 +188,7 @@ function selection(item) {
  * @llistNameist String - name of the list in the data section
  */
 function onInsert(event, boxIndex) {
-  boxes.value[boxIndex].value.push(event.data as never)
+  boxes.value[boxIndex].value.pieces.push(event.data as never)
   checkWinner();
 
   //tbh I don't know if this is needed
@@ -234,9 +245,9 @@ function setDisabled(color) {
 }
 
 function checkAccept(p, box) {
-  if (box.value == undefined || box.value.length === 0) {
+  if (box.value.pieces == undefined || box.value.pieces.length === 0) {
     return true;
-  } else if (p.size > box.value[box.value.length - 1].size) {
+  } else if (p.size > box.value.pieces[box.value.pieces.length - 1].size) {
     return true;
   }
   return false;
@@ -254,11 +265,14 @@ function checkWinner() {
   //Horizontal
   for (let i = 0; i < 3; i++) {
     if (
-      board[i][0].value.at(-1)?.pieceColor === playerColor &&
-      board[i][1].value.at(-1)?.pieceColor === playerColor &&
-      board[i][2].value.at(-1)?.pieceColor === playerColor
+      board[i][0].value.pieces.at(-1)?.pieceColor === playerColor &&
+      board[i][1].value.pieces.at(-1)?.pieceColor === playerColor &&
+      board[i][2].value.pieces.at(-1)?.pieceColor === playerColor
     ) {
       console.log("HORIZONTAL WINNER");
+      board[i][0].value.containsWinningPiece = true;
+      board[i][1].value.containsWinningPiece = true;
+      board[i][2].value.containsWinningPiece = true;
       winner.value = playerColor + " wins";
       currentTurn.value = gameStates.gameOver;
       return true;
@@ -268,11 +282,16 @@ function checkWinner() {
   //Vertical
   for (let i = 0; i < 3; i++) {
     if (
-      board[0][i].value.at(-1)?.pieceColor === playerColor &&
-      board[1][i].value.at(-1)?.pieceColor === playerColor &&
-      board[2][i].value.at(-1)?.pieceColor === playerColor
+      board[0][i].value.pieces.at(-1)?.pieceColor === playerColor &&
+      board[1][i].value.pieces.at(-1)?.pieceColor === playerColor &&
+      board[2][i].value.pieces.at(-1)?.pieceColor === playerColor
     ) {
       console.log("VERTICAL WINNER");
+
+      board[0][i].value.containsWinningPiece = true;
+      board[1][i].value.containsWinningPiece = true;
+      board[2][i].value.containsWinningPiece = true;
+
       winner.value = playerColor + " wins";
       currentTurn.value = gameStates.gameOver;
       return true;
@@ -281,21 +300,31 @@ function checkWinner() {
 
   //Diagonals
   if (
-    board[0][0].value.at(-1)?.pieceColor === playerColor &&
-    board[1][1].value.at(-1)?.pieceColor === playerColor &&
-    board[2][2].value.at(-1)?.pieceColor === playerColor
+    board[0][0].value.pieces.at(-1)?.pieceColor === playerColor &&
+    board[1][1].value.pieces.at(-1)?.pieceColor === playerColor &&
+    board[2][2].value.pieces.at(-1)?.pieceColor === playerColor
   ) {
     console.log("DIAGONAL WINNER");
+
+    board[0][0].value.containsWinningPiece = true;
+    board[1][1].value.containsWinningPiece = true;
+    board[2][2].value.containsWinningPiece = true;
+
     winner.value = playerColor + " wins";
     currentTurn.value = gameStates.gameOver;
     return true;
   }
   if (
-    board[1][0].value.at(-1)?.pieceColor === playerColor &&
-    board[1][1].value.at(-1)?.pieceColor === playerColor &&
-    board[0][2].value.at(-1)?.pieceColor === playerColor
+    board[0][2].value.pieces.at(-1)?.pieceColor === playerColor &&
+    board[1][1].value.pieces.at(-1)?.pieceColor === playerColor &&
+    board[2][0].value.pieces.at(-1)?.pieceColor === playerColor
   ) {
     console.log("DIAGONAL WINNER");
+
+    board[0][2].value.containsWinningPiece = true;
+    board[1][1].value.containsWinningPiece = true;
+    board[2][0].value.containsWinningPiece = true;
+
     winner.value = playerColor + " wins";
     currentTurn.value = gameStates.gameOver;
     return true;
@@ -313,7 +342,8 @@ function checkWinner() {
 function resetBoard() {
   //reset boxes
   boxes.value.forEach((b) => {
-    b.value = [];
+    b.value.pieces = [];
+    b.value.containsWinningPiece = false;
   });
 
   //reset pieces
