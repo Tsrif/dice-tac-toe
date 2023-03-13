@@ -1,27 +1,15 @@
 <template>
   <div>
     <div v-if="size === 1">
-      <font-awesome-icon
-        icon="fa-solid fa-dice-one"
-        :color="actualPieceColor"
-        :size="iconSize"
-      />
+      <font-awesome-icon icon="fa-solid fa-dice-one" :color="actualPieceColor" :size="iconSize" />
     </div>
 
     <div v-else-if="size === 2">
-      <font-awesome-icon
-        icon="fa-solid fa-dice-two"
-        :color="actualPieceColor"
-        :size="iconSize"
-      />
+      <font-awesome-icon icon="fa-solid fa-dice-two" :color="actualPieceColor" :size="iconSize" />
     </div>
 
     <div v-else-if="size === 3">
-      <font-awesome-icon
-        icon="fa-solid fa-dice-three"
-        :color="actualPieceColor"
-        :size="iconSize"
-      />
+      <font-awesome-icon icon="fa-solid fa-dice-three" :color="actualPieceColor" :size="iconSize" />
     </div>
   </div>
 </template>

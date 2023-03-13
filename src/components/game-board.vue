@@ -1,50 +1,41 @@
 <!-- used this as a base https://codesandbox.io/s/multidraganddropmultiplelists-w2426?file=/src/App.vue -->
 <template>
-<!-- TURN ORDER -->
-  <div class="flex items-center justify-center text-lg" v-if="!winner">
-    <div class="w-10 h-10 rounded" :class="
-      currentTurn == gameStates.player1Turn ? 'bg-red-500' : 'bg-gray-500'
-    "></div>
+  <div class="justify-center min-w-max">
+    <!-- TOP BAR -->
+    <div class="flex justify-center text-lg">
+      <!-- TURN ORDER -->
+      <div class="flex ml-auto" v-if="!winner">
+        <div class="w-10 h-10 rounded" :class="
+          currentTurn == gameStates.player1Turn ? 'bg-[#F43F5E]' : 'bg-gray-500'
+        "></div>
 
-    <div class="p-5">TURN</div>
-    <div class="w-10 h-10 rounded" :class="
-      currentTurn == gameStates.player2Turn ? 'bg-blue-600' : 'bg-gray-500'
-    "></div>
-    <div class="top-0 left-40">
-      <rules></rules>
+        <div class="px-5">TURN</div>
+        <div class="w-10 h-10 rounded" :class="
+          currentTurn == gameStates.player2Turn ? 'bg-[#0EA5E9]' : 'bg-gray-500'
+        "></div>
+      </div>
+      <div v-else>
+        {{ winner }}
+      </div>
+      <!-- RULES -->
+      <div class="ml-auto">
+        <rules></rules>
+      </div>
     </div>
-  </div>
-
-  <div class="flex items-center justify-center text-lg" v-else>
-    {{ winner }}
-  </div>
-
-  <!-- PLAYER 1 PIECES -->
-  <div class="flex items-center justify-center w-[850px]">
-    <transition-group name="list" tag="div" class="grid grid-cols-1 gap-3">
-      <drag v-for="piece in player1Pieces" :key="piece.id"
-        :disabled="currentTurn == gameStates.player1Turn ? false : true" class="drag" :data="piece"
-        @cut="remove(player1Pieces, piece)">
-        <gamePiece :pieceColor="
-          currentTurn == gameStates.player1Turn ? piece.pieceColor : 'gray'
-        " :size="piece.size">
-        </gamePiece>
-      </drag>
-    </transition-group>
-
     <!-- GAMEBOARD -->
-    <div fluid class="wrapper grid grid-cols-3 gap-3 p-5">
+    <div fluid class="wrapper grid grid-cols-3 gap-2 p-5">
       <!--START DRAG DROP BOX -->
       <div v-for="(box, index) in boxes" :key="index">
-        <drop-list :items="box.value.pieces" :class="box.value.containsWinningPiece ? 'bg-green-700' : ''" class="list" @insert="onInsert($event, index)" @reorder="$event.apply(box.value.pieces)"
-          mode="cut" :accepts-data="(p) => checkAccept(p, box)">
+        <drop-list :items="box.value.pieces" :class="box.value.containsWinningPiece ? 'bg-green-700' : ''" class="list"
+          @insert="onInsert($event, index)" @reorder="$event.apply(box.value.pieces)" mode="cut"
+          :accepts-data="(p) => checkAccept(p, box)">
           <!-- gamepiece / inside the droplist -->
           <template v-slot:item="{ item }">
             <div>
               <drag v-if="item === box.value.pieces[box.value.pieces.length - 1]" class="item"
                 :class="{ selected: selected.indexOf(item as never) > -1 }" :disabled="setDisabled(item.pieceColor)"
-                @click="toggleSelected(box.value.pieces, item)" @cut="remove(box.value.pieces, item)" :data="selection(item)"
-                :key="item.id">
+                @click="toggleSelected(box.value.pieces, item)" @cut="remove(box.value.pieces, item)"
+                :data="selection(item)" :key="item.id">
                 <gamePiece :pieceColor="item.pieceColor" :size="item.size">
                 </gamePiece>
               </drag>
@@ -67,11 +58,22 @@
       </div>
       <!--END DRAG DROP BOX -->
     </div>
+    <!-- PLAYER 1 PIECES -->
+    <transition-group name="list" tag="div" class="flex justify-center ">
+      <drag v-for="piece in player1Pieces" :key="piece.id"
+        :disabled="currentTurn == gameStates.player1Turn ? false : true" class="drag px-2" :data="piece"
+        @cut="remove(player1Pieces, piece)">
+        <gamePiece :pieceColor="
+          currentTurn == gameStates.player1Turn ? piece.pieceColor : 'gray'
+        " :size="piece.size">
+        </gamePiece>
+      </drag>
+    </transition-group>
 
     <!-- PLAYER 2 PIECES -->
-    <transition-group name="list" tag="div" class="grid grid-cols-1 gap-3 flex-1">
+    <transition-group name="list" tag="div" class="flex justify-center ">
       <drag v-for="piece in player2Pieces" :key="piece.id"
-        :disabled="currentTurn == gameStates.player2Turn ? false : true" class="drag" :data="piece"
+        :disabled="currentTurn == gameStates.player2Turn ? false : true" class="drag px-2" :data="piece"
         @cut="remove(player2Pieces, piece)">
         <gamePiece :pieceColor="
           currentTurn == gameStates.player2Turn ? piece.pieceColor : 'gray'
@@ -79,14 +81,13 @@
         </gamePiece>
       </drag>
     </transition-group>
-  </div>
-
-  <!-- RESET BUTTON -->
-  <div class="flex items-center justify-center text-lg">
-    <button @click="resetBoard" type="button"
-      class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-      RESET
-    </button>
+    <!-- RESET BUTTON -->
+    <div class="flex  justify-center text-lg py-3">
+      <button @click="resetBoard" type="button"
+        class="inline-flex rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        RESET
+      </button>
+    </div>
   </div>
 </template>
   
@@ -136,15 +137,15 @@ const player2Pieces = ref([
   new GamePieceData(12, "blue", 3),
 ]);
 
-const box1Data = ref(new GameBoxData([],false));
-const box2Data = ref(new GameBoxData([],false));
-const box3Data = ref(new GameBoxData([],false));
-const box4Data = ref(new GameBoxData([],false));
-const box5Data = ref(new GameBoxData([],false));
-const box6Data = ref(new GameBoxData([],false));
-const box7Data = ref(new GameBoxData([],false));
-const box8Data = ref(new GameBoxData([],false));
-const box9Data = ref(new GameBoxData([],false));
+const box1Data = ref(new GameBoxData([], false));
+const box2Data = ref(new GameBoxData([], false));
+const box3Data = ref(new GameBoxData([], false));
+const box4Data = ref(new GameBoxData([], false));
+const box5Data = ref(new GameBoxData([], false));
+const box6Data = ref(new GameBoxData([], false));
+const box7Data = ref(new GameBoxData([], false));
+const box8Data = ref(new GameBoxData([], false));
+const box9Data = ref(new GameBoxData([], false));
 
 const boxes = ref([
   box1Data,
@@ -420,29 +421,20 @@ function resetBoard() {
 }
 
 .wrapper .list {
-  border: 1px solid white;
+  border: 3px solid #D6D3D1;
   width: 200px;
   min-height: 200px;
   border-radius: 0.25rem;
 }
 
 .wrapper .list .item {
-  /* padding: 20px;
-  margin: 10px;
-  background-color: #131342; */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
 
-/* .wrapper .list .item.selected {
-  border: 2px solid red;
-} */
-/* .wrapper .list .item.feedback {
-  background-color: #ffdcdc;
-  border: 2px dashed black;
-} */
+
 .wrapper .list .item.drag-image {
   background-color: #dcffdc;
   transform: translate(-50%, -50%);
